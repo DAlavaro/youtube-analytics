@@ -1,5 +1,7 @@
 import json
 import os
+
+import isodate
 from googleapiclient.discovery import build
 
 class Video:
@@ -27,6 +29,7 @@ class Video:
     def video_title(self) -> str:
         return self.my_service()['items'][0]['snippet']['title']
 
+
     @property
     def view_count(self):
         return self.my_service()['items'][0]['statistics']['viewCount']
@@ -39,9 +42,20 @@ class Video:
     def comment_count(self):
         return self.my_service()['items'][0]['statistics']['commentCount']
 
+    @property
+    def duration(self):
+        duration_str = self.my_service()['items'][0]['contentDetails']['duration']
+        duration = isodate.parse_duration(duration_str)
+        return duration
+
 
 class PLVideo(Video):
 
     def __init__(self, video_id, playlist_id):
         super().__init__(video_id)
         self.playlist_id = playlist_id
+
+    @property
+    def url(self):
+        return f'https://www.youtube.com/playlist?list={self.playlist_id}'
+
