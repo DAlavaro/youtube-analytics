@@ -48,6 +48,9 @@ class Video:
         duration = isodate.parse_duration(duration_str)
         return duration
 
+    def url(self):
+        return f'https://youtu.be/{self.video_id}'
+
 
 class PLVideo(Video):
 

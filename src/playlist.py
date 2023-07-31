@@ -55,13 +55,12 @@ class PlayList:
 
         for video_id in video_ids:
             video = Video(video_id)
-            likes = video.like_count
+            likes = int(video.like_count)
             if likes > max_likes:
                 max_likes = likes
                 best_video = video
 
-        return best_video.url if best_video else None
-
+        return best_video.url() if best_video else None
 
 
 
