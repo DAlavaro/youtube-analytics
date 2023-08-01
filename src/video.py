@@ -3,6 +3,8 @@ import os
 
 import isodate
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
 
 class Video:
     """Класс для видео"""
@@ -11,7 +13,12 @@ class Video:
         self.video_id = video_id
         self.api_key: str = os.getenv('YOUTUBE_API')
         self.video_data = None
-        self.fetch_video_data()
+        self.video_data = None
+        try:
+            self.fetch_video_data()
+        except HttpError as e:
+            print(f"Error fetching video data: {e}")
+            self.video_data = None
 
 
     def fetch_video_data(self):
@@ -19,15 +26,19 @@ class Video:
         video = youtube.videos().list(id=self.video_id, part='snippet,statistics,contentDetails,topicDetails').execute()
         self.video_data = json.dumps(video, indent=2, ensure_ascii=False)
 
+
     def __str__(self):
-        return self.video_title
+        return self.title
 
     def my_service(self):
         return json.loads(self.video_data)
 
     @property
-    def video_title(self) -> str:
-        return self.my_service()['items'][0]['snippet']['title']
+    def title(self) -> str:
+        if self.my_service()['items']:
+            return self.my_service()['items'][0]['snippet']['title']
+        else:
+            None
 
 
     @property
@@ -36,7 +47,9 @@ class Video:
 
     @property
     def like_count(self):
-        return self.my_service()['items'][0]['statistics']['likeCount']
+        if self.my_service()['items']:
+            return self.my_service()['items'][0]['statistics']['likeCount']
+        return None
 
     @property
     def comment_count(self):
